@@ -58,8 +58,8 @@ def home_page():
 def register_login_page():
     email = None
     if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
+        email = request.form.get('email').strip()
+        password = request.form.get('password').strip()
         user = Customer.login(email, password)
         if user:
             session['user_id'] = user.email
@@ -138,7 +138,7 @@ def view_bookings():
     if user_email:
         # כאן נשארנו עם הלוגיקה המקורית שעובדת עבור משתמש רשום
         conf, comp, c_you, c_sys = Booking.get_user_bookings(user_email)
-        return render_template('bookings_results.html',
+        return render_template('booking_results.html',
                                confirmed=conf, completed=comp,
                                cancelled_by_you=c_you, cancelled_by_system=c_sys,
                                is_guest=False, now=now)
@@ -551,17 +551,21 @@ def booking_summery_page():
 
     flight_id = booking_data['flight_id']
     seat_strings = booking_data['seats']
-    passengers = booking_data.get('passengers', [])
+    passengers = booking_data.get('passengers', [])  # <--- שליפת רשימת הנוסעים המוכנה
 
+    # 1. שליפת פרטי הטיסה
     raw_flight = db.get_flight_data(flight_id=flight_id)
     if raw_flight:
         flight = prepare_flights_for_view(raw_flight)[0]
     else:
         return redirect("/")
 
+    # 2. חישוב מחירים ושורות לטבלה
     seats_prices = db.get_flight_prices(flight_id)
     summary_rows = []
     total_price = 0.0
+
+
 
     for i, seat_str in enumerate(seat_strings, 1):
         parts = seat_str.split('-')
@@ -590,6 +594,7 @@ def booking_summery_page():
         })
 
     formatted_total = _format_price(total_price)
+
     return render_template("booking_payment.html",
                            flight=flight,
                            summary_rows=summary_rows,
@@ -597,6 +602,7 @@ def booking_summery_page():
 
 @app.route("/booking-confirmation/<int:booking_id>")
 def booking_confirmation_page(booking_id):
+    # שליפת המייל מה-URL כדי להציג אותו למשתמש
     email = request.args.get('email', '')
     return render_template("booking_confirmation.html", booking_id=booking_id, email=email)
 
