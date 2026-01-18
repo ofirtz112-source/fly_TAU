@@ -21,45 +21,27 @@ class Database:
                 cls._instance.connection = None
         return cls._instance
 
-
-    def get_customer_bookings(self, email):
-        query = """
-            SELECT b.id_booking, b.booking_date, b.status as booking_status, b.total_price,
-                   f.id_flight, f.departure_time, r.origin_code, a1.city as origin_city,
-                   r.destination_code, a2.city as destination_city,
-                   t.passenger_name, t.passenger_passport, t.seat_letter, t.row_number, t.class_type
-            FROM bookings b
-            JOIN tickets t ON b.id_booking = t.id_booking
-            JOIN flights f ON t.id_flight = f.id_flight
-            JOIN routes r ON f.id_route = r.id_route
-            JOIN airports a1 ON r.origin_code = a1.airport_code
-            JOIN airports a2 ON r.destination_code = a2.airport_code
-            WHERE b.customers_email = %s ORDER BY f.departure_time DESC
-        """
-        cursor = self.connection.cursor(dictionary=True)
-        cursor.execute(query, (email,))
-        res = cursor.fetchall()
-        cursor.close()
-        return res
-
     def get_single_booking(self, email, booking_id):
+        """Fetches detailed information for a specific booking ID linked to either customer or registered email."""
         query = """
             SELECT b.id_booking, b.status as booking_status, b.total_price,
                    f.departure_time, a1.city as origin_city, a2.city as destination_city,
-                   t.passenger_name, t.seat_letter, t.row_number, t.class_type
+                   t.passenger_name, t.seat_letter, t.`row_number`, t.class_type
             FROM bookings b
             JOIN tickets t ON b.id_booking = t.id_booking
             JOIN flights f ON t.id_flight = f.id_flight
             JOIN routes r ON f.id_route = r.id_route
             JOIN airports a1 ON r.origin_code = a1.airport_code
             JOIN airports a2 ON r.destination_code = a2.airport_code
-            WHERE b.customers_email = %s AND b.id_booking = %s
+            WHERE (b.customers_email = %s OR b.registered_email = %s) AND b.id_booking = %s
         """
         cursor = self.connection.cursor(dictionary=True)
-        cursor.execute(query, (email, booking_id))
-        res = cursor.fetchall()
-        cursor.close()
-        return res
+        try:
+            # We pass the email twice to check both potential columns
+            cursor.execute(query, (email.strip(), email.strip(), str(booking_id).strip()))
+            return cursor.fetchall()
+        finally:
+            cursor.close()
 
     def get_booking_details_for_cancellation(self, booking_id):
         # העתקנו את השאילתה בדיוק מתוך main.py כדי לשמור על הלוגיקה
@@ -229,7 +211,7 @@ class Database:
                 f.id_flight, f.departure_time,
                 r.origin_code, a1.city as origin_city,
                 r.destination_code, a2.city as destination_city,
-                t.passenger_name, t.passenger_passport, t.seat_letter, t.row_number, t.class_type
+                t.passenger_name, t.passenger_passport, t.seat_letter, t.`row_number`, t.class_type
             FROM bookings b
             JOIN tickets t ON b.id_booking = t.id_booking
             JOIN flights f ON t.id_flight = f.id_flight
@@ -826,7 +808,7 @@ class Database:
                             cursor.execute(
                                 "INSERT INTO seats (`row_number`, seat_letter, class_type, id_plane) VALUES (%s, %s, %s, %s)",
                                 (r, l, c_type, id_p))
-             
+
             elif res_type in ['pilot', 'attendant']:
                 # קביעת שם הטבלה בהתאם לסוג המשאב
                 table = "pilots" if res_type == 'pilot' else "flight_attendants"
