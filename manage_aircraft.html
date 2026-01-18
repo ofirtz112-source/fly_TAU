@@ -19,8 +19,9 @@
             <div class="form-grid">
                 {% if edit_type == 'aircraft' or add_type == 'aircraft' %}
                     <div>
-                        <label>Aircraft ID</label>
-                        <input type="text" name="id_plane" value="{{ item_to_edit.id_plane if item_to_edit else '' }}" {{ 'readonly' if item_to_edit }} required>
+                        <label>Aircraft ID (Numbers Only)</label>
+                        <input type="text" name="id_plane" value="{{ item_to_edit.id_plane if item_to_edit else '' }}"
+                               {{ 'readonly' if item_to_edit }} required pattern="[0-9]+" title="נא להזין מספרים בלבד">
                     </div>
                     <div>
                         <label>Manufacturer</label>
@@ -33,7 +34,7 @@
                     </div>
                     <div>
                         <label>Size</label>
-                        <select name="size" required>
+                        <select name="size" required id="size-select">
                             <option value="" disabled {{ 'selected' if not item_to_edit }}>Choose Size...</option>
                             <option value="Small" {{ 'selected' if item_to_edit and item_to_edit.size == 'Small' }}>Small</option>
                             <option value="Large" {{ 'selected' if item_to_edit and item_to_edit.size == 'Large' }}>Large</option>
@@ -43,44 +44,68 @@
                         <label>Purchase Date</label>
                         <input type="date" name="purchase_date" value="{{ item_to_edit.purchase_date if item_to_edit else '' }}" required>
                     </div>
+
+                    <div style="grid-column: 1 / -1; margin-top: 20px; border-top: 1px solid #edf2f7; padding-top: 20px;">
+                        <h4 style="font-family: 'Oswald'; color: #4a5568;">Seat Configuration</h4>
+                        <div class="form-grid">
+                            <div>
+                                <label>Economy Rows</label>
+                                <input type="number" name="eco_rows" placeholder="e.g. 20" required min="1">
+                            </div>
+                            <div>
+                                <label>Economy Columns</label>
+                                <input type="number" name="eco_cols" placeholder="e.g. 6" required min="1" max="10">
+                            </div>
+                            <div id="bus-config" style="display: none; grid-column: 1 / -1;">
+                                <div class="form-grid">
+                                    <div>
+                                        <label>Business Rows</label>
+                                        <input type="number" name="bus_rows" id="bus_rows" placeholder="e.g. 4" min="0">
+                                    </div>
+                                    <div>
+                                        <label>Business Columns</label>
+                                        <input type="number" name="bus_cols" id="bus_cols" placeholder="e.g. 4" min="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 {% else %}
                     <div>
-                        <label>Worker ID</label>
-                        <input type="text" name="id_worker" value="{{ item_to_edit.id_worker if item_to_edit else '' }}" {{ 'readonly' if item_to_edit }} required placeholder="e.g. 201">
+                        <label>Worker ID (Numbers Only)</label>
+                        <input type="text" name="id_worker" value="{{ item_to_edit.id_worker if item_to_edit else '' }}"
+                               {{ 'readonly' if item_to_edit }} required pattern="[0-9]+" title="נא להזין מספרים בלבד">
                     </div>
                     <div>
-                        <label>First Name</label>
-                        <input type="text" name="first_name" value="{{ item_to_edit.first_name if item_to_edit else '' }}" required>
+                        <label>First Name (Hebrew Only)</label>
+                        <input type="text" name="first_name" value="{{ item_to_edit.first_name if item_to_edit else '' }}"
+                               required pattern="[א-ת\s]+" title="אותיות בעברית בלבד">
                     </div>
                     <div>
-                        <label>Last Name</label>
-                        <input type="text" name="last_name" value="{{ item_to_edit.last_name if item_to_edit else '' }}" required>
+                        <label>Last Name (Hebrew Only)</label>
+                        <input type="text" name="last_name" value="{{ item_to_edit.last_name if item_to_edit else '' }}"
+                               required pattern="[א-ת\s]+" title="אותיות בעברית בלבד">
                     </div>
                     <div>
-                        <label>Phone Number</label>
-                        <input type="text" name="phone" value="{{ item_to_edit.phone_number if item_to_edit else '' }}" required>
+                        <label>Phone (Numbers Only)</label>
+                        <input type="text" name="phone" value="{{ item_to_edit.phone_number if item_to_edit else '' }}"
+                               required pattern="[0-9]+" title="מספרים בלבד">
                     </div>
                     <div>
                         <label>Start Date</label>
                         <input type="date" name="start_date" value="{{ item_to_edit.start_date if item_to_edit else '' }}" required>
                     </div>
                     <div>
-                        <label>City</label>
-                        <input type="text" name="city" value="{{ item_to_edit.city if item_to_edit else '' }}" required>
+                        <label>City (Hebrew)</label>
+                        <input type="text" name="city" value="{{ item_to_edit.city if item_to_edit else '' }}" required pattern="[א-ת\s]+">
                     </div>
                     <div>
-                        <label>Street</label>
-                        <input type="text" name="street" value="{{ item_to_edit.street if item_to_edit else '' }}" required>
+                        <label>Street (Hebrew)</label>
+                        <input type="text" name="street" value="{{ item_to_edit.street if item_to_edit else '' }}" required pattern="[א-ת\s]+">
                     </div>
                     <div>
                         <label>House Number</label>
-                        <input type="number" name="house_number" value="{{ item_to_edit.house_number if item_to_edit else '' }}" required>
-                    </div>
-
-                    <div style="grid-column: 1 / -1; margin-top: 10px; display: flex; align-items: center;">
-                        <input type="checkbox" name="long_flights" id="longFlights" style="width: auto; margin-right: 10px;"
-                               {{ 'checked' if item_to_edit and item_to_edit.long_flights else '' }}>
-                        <label for="longFlights" style="margin: 0; font-weight: normal;">Qualified for Long Haul Flights?</label>
+                        <input type="number" name="house_number" value="{{ item_to_edit.house_number if item_to_edit else '' }}" required min="1">
                     </div>
                 {% endif %}
             </div>
@@ -96,83 +121,71 @@
     <div style="display: grid; grid-template-columns: 1fr; gap: 40px;">
         <section>
             <h3 style="font-family: 'Oswald'; margin-top: 0;">Aircraft Fleet</h3>
-            <div style="max-height: 400px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
-                <table class="admin-table">
-                    <thead>
-                        <tr><th>ID</th><th>Manufacturer</th><th>Size</th><th> </th></tr>
-                    </thead>
-                    <tbody>
-                        {% for p in planes %}
-                        <tr>
-                            <td>{{ p.id_plane }}</td>
-                            <td>{{ p.manufacturer }}</td>
-                            <td>{{ p.size }}</td>
-                            <td>
-                                <a href="{{ url_for('manage_aircraft', edit_type='aircraft', edit_id=p.id_plane) }}" style="text-decoration:none;">✏️</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div style="margin-top: 10px; text-align: right;">
-                <a href="{{ url_for('manage_aircraft', add_type='aircraft') }}" style="text-decoration:none; font-size: 1.5rem;" title="Add Aircraft">➕</a>
+            <table class="admin-table">
+                <thead><tr><th>ID</th><th>Manufacturer</th><th>Size</th><th> </th></tr></thead>
+                <tbody>
+                    {% for p in planes %}
+                    <tr><td>{{ p.id_plane }}</td><td>{{ p.manufacturer }}</td><td>{{ p.size }}</td>
+                    <td><a href="{{ url_for('manage_aircraft', edit_type='aircraft', edit_id=p.id_plane) }}">✏️</a></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div style="text-align: right; margin-top: 10px;">
+                <a href="{{ url_for('manage_aircraft', add_type='aircraft') }}" style="font-size: 1.5rem; text-decoration:none;">➕</a>
             </div>
         </section>
 
         <section>
             <h3 style="font-family: 'Oswald'; margin-top: 0;">Pilots</h3>
-            <div style="max-height: 400px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
-                <table class="admin-table">
-                    <thead>
-                        <tr><th>ID</th><th>First Name</th><th>Last Name</th><th>Long flights</th><th> </th></tr>
-                    </thead>
-                    <tbody>
-                        {% for pilot in pilots %}
-                        <tr>
-                            <td>{{ pilot.id_worker }}</td>
-                            <td>{{ pilot.first_name }}</td>
-                            <td>{{ pilot.last_name }}</td>
-                            <td>{{ '✔️' if pilot.long_flights else '✖️' }}</td>
-                            <td>
-                                <a href="{{ url_for('manage_aircraft', edit_type='pilot', edit_id=pilot.id_worker) }}" style="text-decoration:none;">✏️</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div style="margin-top: 10px; text-align: right;">
-                <a href="{{ url_for('manage_aircraft', add_type='pilot') }}" style="text-decoration:none; font-size: 1.5rem;" title="Add Pilot">➕</a>
+            <table class="admin-table">
+                <thead><tr><th>ID</th><th>Name</th><th>Long flights</th><th> </th></tr></thead>
+                <tbody>
+                    {% for pilot in pilots %}
+                    <tr><td>{{ pilot.id_worker }}</td><td>{{ pilot.first_name }} {{ pilot.last_name }}</td>
+                    <td>{{ '✔️' if pilot.long_flights else '✖️' }}</td>
+                    <td><a href="{{ url_for('manage_aircraft', edit_type='pilot', edit_id=pilot.id_worker) }}">✏️</a></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div style="text-align: right; margin-top: 10px;">
+                <a href="{{ url_for('manage_aircraft', add_type='pilot') }}" style="font-size: 1.5rem; text-decoration:none;">➕</a>
             </div>
         </section>
 
         <section>
             <h3 style="font-family: 'Oswald'; margin-top: 0;">Service Crew</h3>
-            <div style="max-height: 400px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
-                <table class="admin-table">
-                    <thead>
-                        <tr><th>ID</th><th>First Name</th><th>Last Name</th><th>Long flights</th><th> </th></tr>
-                    </thead>
-                    <tbody>
-                        {% for fa in attendants %}
-                        <tr>
-                            <td>{{ fa.id_worker }}</td>
-                            <td>{{ fa.first_name }}</td>
-                            <td>{{ fa.last_name }}</td>
-                            <td>{{ '✔️' if fa.long_flights else '✖️' }}</td>
-                            <td>
-                                <a href="{{ url_for('manage_aircraft', edit_type='attendant', edit_id=fa.id_worker) }}" style="text-decoration:none;">✏️</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div style="margin-top: 10px; text-align: right;">
-                <a href="{{ url_for('manage_aircraft', add_type='attendant') }}" style="text-decoration:none; font-size: 1.5rem;" title="Add Attendant">➕</a>
+            <table class="admin-table">
+                <thead><tr><th>ID</th><th>Name</th><th>Long flights</th><th> </th></tr></thead>
+                <tbody>
+                    {% for fa in attendants %}
+                    <tr><td>{{ fa.id_worker }}</td><td>{{ fa.first_name }} {{ fa.last_name }}</td>
+                    <td>{{ '✔️' if fa.long_flights else '✖️' }}</td>
+                    <td><a href="{{ url_for('manage_aircraft', edit_type='attendant', edit_id=fa.id_worker) }}">✏️</a></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div style="text-align: right; margin-top: 10px;">
+                <a href="{{ url_for('manage_aircraft', add_type='attendant') }}" style="font-size: 1.5rem; text-decoration:none;">➕</a>
             </div>
         </section>
     </div>
 </div>
+
+<script>
+    const sizeSelect = document.getElementById('size-select');
+    if (sizeSelect) {
+        sizeSelect.addEventListener('change', function() {
+            const busConfig = document.getElementById('bus-config');
+            const busRows = document.getElementById('bus_rows');
+            const busCols = document.getElementById('bus_cols');
+            if (this.value === 'Large') {
+                busConfig.style.display = 'block';
+                busRows.required = true; busCols.required = true;
+            } else {
+                busConfig.style.display = 'none';
+                busRows.required = false; busCols.required = false;
+            }
+        });
+    }
+</script>
 {% endblock %}
