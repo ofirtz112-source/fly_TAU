@@ -19,9 +19,11 @@
             <div class="form-grid">
                 {% if edit_type == 'aircraft' or add_type == 'aircraft' %}
                     <div>
-                        <label>Aircraft ID (Numbers Only)</label>
-                        <input type="text" name="id_plane" value="{{ item_to_edit.id_plane if item_to_edit else '' }}"
-                               {{ 'readonly' if item_to_edit }} required pattern="[0-9]+" title="נא להזין מספרים בלבד">
+                      <label>Aircraft ID</label>
+                    <input type="text" name="id_plane" value="{{ item_to_edit.id_plane if item_to_edit else '' }}"
+                           {{ 'readonly' if item_to_edit }} required pattern="[a-zA-Z0-9\-]+"
+                           title="Please enter English letters, numbers, and hyphens only">
+
                     </div>
                     <div>
                         <label>Manufacturer</label>
