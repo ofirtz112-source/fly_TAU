@@ -86,11 +86,18 @@
                     </div>
                     {% endfor %}
                 </div>
-
-                {% if category == 'Confirmed' %}
+                    {% if category == 'Confirmed' %}
                     <div style="margin-top: 20px; text-align: right;">
                         <button type="button" class="btn-cancel-flight"
                                 onclick="initiateCancel('{{ booking.info.id_booking }}', '{{ booking.info.departure_time.isoformat() }}', {{ booking.info.total_price|float }})">
+                            Cancel Booking
+                        </button>
+                    </div>
+                {% else %}
+                    <div style="margin-top: 20px; text-align: right;">
+                        <button type="button" class="btn-cancel-flight" disabled
+                                style="background-color: #edf2f7; color: #a0aec0; border-color: #e2e8f0; cursor: not-allowed;"
+                                title="Cancellation is no longer available for this booking">
                             Cancel Booking
                         </button>
                     </div>
