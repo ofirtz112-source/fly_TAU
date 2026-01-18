@@ -65,6 +65,7 @@
             <span id="dept-label">Select Date</span>
             <input type="text" name="date" class="flatpickr-input hidden-date" value="{{ date or '' }}" required>
         </div>
+        <div class="field-error" id="error-date"></div>
       </div>
 
       <div class="search-field date-wrapper" id="return-date-div">
@@ -93,24 +94,7 @@
       <button type="submit" class="btn-search">Search Flights</button>
     </form>
 
-    <section class="destinations-section">
-        <h2 class="section-title">Explore Our Top Cities</h2>
-        <div class="destinations-grid">
-            {% set city_list = [
-                ('Tel Aviv', 'telaviv.png'), ('Amsterdam', 'amsterdam.png'), ('Berlin', 'berlin.png'),
-                ('Cairo', 'cairo.png'), ('Athens', 'athens.png'), ('Tokyo', 'tokyo.png'),
-                ('New York', 'newyork.png'), ('London', 'london.png'), ('Paris', 'paris.png'), ('Rome', 'rome.png')
-            ] %}
-            {% for city, img_name in city_list %}
-            <div class="dest-item" onclick="openDestinationInfo('{{ city }}')">
-                <div class="icon-circle">
-                    <img src="{{ url_for('static', filename='images/' + img_name) }}" alt="{{ city }}">
-                </div>
-                <span>{{ city }}</span>
-            </div>
-            {% endfor %}
-        </div>
-    </section>
+
 
     {% if search_performed %}
       <div class="results-container">
@@ -179,11 +163,32 @@
         {% endif %}
       </div>
     {% endif %}
+
+      <section class="destinations-section">
+        <h2 class="section-title">Explore Our Top Cities</h2>
+        <div class="destinations-grid">
+            {% set city_list = [
+                ('Tel Aviv', 'telaviv.png'), ('Amsterdam', 'amsterdam.png'), ('Berlin', 'berlin.png'),
+                ('Cairo', 'cairo.png'), ('Athens', 'athens.png'), ('Tokyo', 'tokyo.png'),
+                ('New York', 'newyork.png'), ('London', 'london.png'), ('Paris', 'paris.png'), ('Rome', 'rome.png')
+            ] %}
+            {% for city, img_name in city_list %}
+            <div class="dest-item" onclick="openDestinationInfo('{{ city }}')">
+                <div class="icon-circle">
+                    <img src="{{ url_for('static', filename='images/' + img_name) }}" alt="{{ city }}">
+                </div>
+                <span>{{ city }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
   </div>
 {% endblock %}
 
 {% block scripts %}
   <script>
+    // --- נתונים ופונקציות ליעדים (לא השתנה) ---
     const destinationInfo = {
         "Tel Aviv": { text: "Tel Aviv is a vibrant city in Israel, known for its stunning Mediterranean beaches, world-class nightlife, and the historic Jaffa port.", fact: "Tel Aviv has the highest number of vegans per capita in the world!" },
         "Amsterdam": { text: "Amsterdam, the capital of the Netherlands, is famous for its artistic heritage, elaborate canal system, and narrow houses with gabled facades.", fact: "There are 165 canals in Amsterdam - more than in Venice!" },
@@ -213,6 +218,8 @@
         if (event.target == document.getElementById('dest-modal')) closeModal();
     }
 
+    // --- פונקציות עזר לטופס ---
+
     function toggleTripType() {
         const isOneWay = document.querySelector('input[name="trip_type"]:checked').value === 'oneway';
         document.getElementById('return-date-div').style.display = isOneWay ? 'none' : '';
@@ -225,11 +232,33 @@
         document.getElementById(labelId).innerText = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
     }
 
+    // --- טעינת הדף והגדרת לוחות השנה ---
     document.addEventListener('DOMContentLoaded', function() {
-        // Flatpickr נטען מ-base.html
-        const rp = flatpickr('input[name="return_date"]', { dateFormat: "Y-m-d", minDate: "today", onChange: (sd, ds) => updateLabel(ds, "return-label") });
-        flatpickr('input[name="date"]', { dateFormat: "Y-m-d", minDate: "today", onChange: (sd, ds) => { updateLabel(ds, "dept-label"); rp.set('minDate', ds); } });
+        // הגדרת לוח השנה לתאריך חזרה
+        const rp = flatpickr('input[name="return_date"]', {
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            onChange: (sd, ds) => updateLabel(ds, "return-label")
+        });
 
+        // הגדרת לוח השנה לתאריך יציאה (כולל התיקון לניקוי שגיאות!)
+        flatpickr('input[name="date"]', {
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            onChange: (sd, ds) => {
+                // 1. מעדכן את הטקסט בתצוגה
+                updateLabel(ds, "dept-label");
+
+                // 2. מעדכן את המינימום לתאריך חזרה
+                rp.set('minDate', ds);
+
+                // 3. מנקה את השגיאה האדומה מיד כשבוחרים תאריך
+                document.getElementById('error-date').innerText = "";
+                document.querySelector('.custom-date-btn').style.borderColor = "#e2e8f0";
+            }
+        });
+
+        // שחזור ערכים במידה ויש (למשל אחרי רענון דף)
         const dVal = document.querySelector('input[name="date"]').value;
         const rVal = document.querySelector('input[name="return_date"]').value;
         if(dVal && dVal !== 'None') updateLabel(dVal, "dept-label");
@@ -245,14 +274,41 @@
         el.style.borderColor = valid || !el.value ? "#e2e8f0" : "#e53e3e";
     }
 
+    // --- פונקציית הוולידציה (בדיקת הטופס) ---
     function validateForm() {
+        // 1. ניקוי שגיאות ישנות מתאריך היציאה
+        document.getElementById('error-date').innerText = "";
+        document.querySelector('.custom-date-btn').style.borderColor = "#e2e8f0";
+
+        // 2. שליפת הערכים מהטופס
+        const origin = document.getElementById('origin').value.trim();
+        const destination = document.getElementById('destination').value.trim();
+        const departureDate = document.querySelector('input[name="date"]').value;
         const tripType = document.querySelector('input[name="trip_type"]:checked').value;
         const returnDate = document.querySelector('input[name="return_date"]').value;
-        if (tripType === 'round' && (!returnDate || returnDate === '')) {
-            alert("⚠️ Please select a Return Date for a round trip.\nOr switch to 'One Way' if you don't need a return flight.");
-            return false;
+
+        let isValid = true;
+
+        // 3. בדיקת תאריך יציאה (טיפול ידני - אדום במקום בועה)
+        if (!departureDate) {
+            document.getElementById('error-date').innerText = "Please select a departure date";
+            document.querySelector('.custom-date-btn').style.borderColor = "#e53e3e"; // מסגרת אדומה
+            isValid = false;
         }
-        return true;
+
+        // 4. בדיקת היגיון: אי אפשר לטוס לאותה עיר
+        if (origin && destination && origin.toLowerCase() === destination.toLowerCase()) {
+            alert("⚠️ You cannot fly to the same city you are departing from!");
+            isValid = false;
+        }
+
+        // 5. בדיקת תאריך חזרה (רק אם נבחר הלוך-חזור)
+        if (tripType === 'round' && (!returnDate || returnDate === '')) {
+            alert("⚠️ Please select a Return Date for a round trip.");
+            isValid = false;
+        }
+
+        return isValid;
     }
   </script>
 {% endblock %}
