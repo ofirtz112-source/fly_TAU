@@ -1,3 +1,7 @@
+<!--Seat selection page.
+Displays the seat map for the selected flight, marks unavailable seats,
+and allows the user to choose seats before continuing to booking.-->
+
 {% extends 'base.html' %}
 
 {% block title %}Select Seats - FlyTAU{% endblock %}
@@ -15,6 +19,7 @@
       <h2 class="hero-title">Select Your Seats</h2>
     </div>
 
+<!--Shows a summary of the selected flight -->
     <div class="flight-summary">
       <div class="flight-summary-left">
         <div class="flight-number">Flight No. {{ flight.id_flight }}</div>
@@ -50,7 +55,7 @@
             <span class="legend-text">Selected</span>
         </div>
     </div>
-
+<!--Submits selected seats for the current flight-->
     <form method="POST" action="{{ url_for('process_booking') }}">
 
         <input type="hidden" name="flight_id" value="{{ flight.id_flight }}">
@@ -61,6 +66,8 @@
             <div class="cabin-section">
                 <h3 class="cabin-title">Business Class</h3>
                 <div class="cabin-price">{{ prices['Business'] }} per seat</div>
+
+                <!--Retrieve the number of rows and columns for the Business class from the plane layout.-->
                 {% set rows, cols = plane.rows_cols('Business') %}
 
                 <div class="seats-row header-row">
@@ -78,6 +85,8 @@
                     <div class="seats-cluster">
                         {% for c in range(cols) %}
                             {% set letter = col_letters[c] %}
+
+<!--Check whether the current seat is already taken to disable selection if needed.-->
                             {% set is_taken = (r, letter) in occupied['Business'] %}
                             <div class="seat-wrapper">
                                 <input type="checkbox"
