@@ -76,23 +76,31 @@
                     <div>
                         <label>Worker ID (Numbers Only)</label>
                         <input type="text" name="id_worker" value="{{ item_to_edit.id_worker if item_to_edit else '' }}"
-                               {{ 'readonly' if item_to_edit }} required pattern="[0-9]+" title="נא להזין מספרים בלבד">
+                               {{ 'readonly' if item_to_edit }} required pattern="[0-9]+" title="Numbers only">
                     </div>
                     <div>
                         <label>First Name (Hebrew Only)</label>
                         <input type="text" name="first_name" value="{{ item_to_edit.first_name if item_to_edit else '' }}"
-                               required pattern="[א-ת\s]+" title="אותיות בעברית בלבד">
+                               required pattern="[א-ת\s]+" title="Hebrew letters only">
                     </div>
                     <div>
                         <label>Last Name (Hebrew Only)</label>
                         <input type="text" name="last_name" value="{{ item_to_edit.last_name if item_to_edit else '' }}"
-                               required pattern="[א-ת\s]+" title="אותיות בעברית בלבד">
+                               required pattern="[א-ת\s]+" title="Hebrew letters only">
                     </div>
                     <div>
                         <label>Phone (Numbers Only)</label>
                         <input type="text" name="phone" value="{{ item_to_edit.phone_number if item_to_edit else '' }}"
-                               required pattern="[0-9]+" title="מספרים בלבד">
+                               required pattern="[0-9]+" title="Numbers only">
                     </div>
+                    <div style="grid-column: 1 / -1; margin-top: 10px;">
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" name="long_flights" value="1"
+                        {% if item_to_edit and item_to_edit.long_flights %}checked{% endif %}
+                        style="width: 20px; height: 20px; margin: 0;">
+        <span>Qualified for Long Haul Flights</span>
+    </label>
+</div>
                     <div>
                         <label>Start Date</label>
                         <input type="date" name="start_date" value="{{ item_to_edit.start_date if item_to_edit else '' }}" required>
