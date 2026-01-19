@@ -1,9 +1,12 @@
+<!--Home page and flight search interface.
+Provides one-way/round-trip selection, date pickers (Flatpickr), destination input validation,
+search results rendering (including suggested dates), and a destinations grid with a modal for city details.-->
+
 {% extends "base.html" %}
 
 {% block title %}FlyTAU - Home{% endblock %}
 
 {% block extra_head %}
-    {# Flatpickr CSS נטען ב-base.html #}
 {% endblock %}
 
 {% block content %}
@@ -29,6 +32,8 @@
               <div class="welcome-text">Hi, {{ session.get('first_name', 'Traveler') }}</div>
           </div>
           <div class="nav-links">
+
+<!--Show different navigation links based on whether the user is logged in -->
             {% if 'email' not in session %}
               <a href="{{ url_for('view_bookings') }}">Manage Booking</a>
               <a href="{{ url_for('register_login_page') }}">My Account</a>
@@ -50,12 +55,17 @@
     <form method="GET" action="/" class="search-form-wide" onsubmit="return validateForm()">
       <div class="trip-type-toggle">
           <label class="radio-label">
-              <input type="radio" name="trip_type" value="round" onchange="toggleTripType()" {% if trip_type =='round' or not trip_type %}checked{% endif %}>
+              <input type="radio" name="trip_type" value="round" onchange="toggleTripType()"
+                     {% if trip_type =='round' or not trip_type %}
+                     checked
+                     {% endif %}>
               <span class="radio-custom"></span> Round Trip
           </label>
           <label class="radio-label">
-              <input type="radio" name="trip_type" value="oneway" onchange="toggleTripType()" {% if trip_type =='oneway' %}checked{% endif %}>
-              <span class="radio-custom"></span> One Way
+              <input type="radio" name="trip_type" value="oneway" onchange="toggleTripType()"
+                     {% if trip_type =='oneway' %} checked {% endif %}>
+              <span class="radio-custom"></span>
+              One Way
           </label>
       </div>
 
@@ -78,30 +88,33 @@
 
       <div class="search-field">
         <label>From</label>
-        <input type="text" id="origin" name="origin" placeholder="Where from?" list="destinations_list" value="{{ origin or '' }}" oninput="checkLocation(this)" required>
+        <input type="text" id="origin" name="origin" placeholder="Where from?" list="destinations_list"
+               value="{{ origin or '' }}" oninput="checkLocation(this)" required>
         <div class="field-error" id="error-origin"></div>
       </div>
 
       <div class="search-field">
         <label>To</label>
-        <input type="text" id="destination" name="destination" placeholder="Where to?" list="destinations_list" value="{{ destination or '' }}" oninput="checkLocation(this)" required>
+        <input type="text" id="destination" name="destination" placeholder="Where to?" list="destinations_list"
+               value="{{ destination or '' }}" oninput="checkLocation(this)" required>
         <div class="field-error" id="error-destination"></div>
       </div>
-
+<!-- Populate the destinations autocomplete list from the server-provided destinations -->
       <datalist id="destinations_list">
-        {% for dest in destinations %}<option value="{{ dest.city }}">{{ dest.country }} - {{ dest.airport_name }}</option>{% endfor %}
+        {% for dest in destinations %}
+          <option value="{{ dest.city }}">{{ dest.country }} - {{ dest.airport_name }}</option>
+        {% endfor %}
       </datalist>
       <button type="submit" class="btn-search">Search Flights</button>
     </form>
-
-
-
+<!--Render search results only after the user submits the search form -->
     {% if search_performed %}
       <div class="results-container">
         {% if outbound_flights|length == 0 %}
             <div class="no-flights-alert">
                 <h3>⚠️ No flights found for {{ date }}</h3>
                 <p>We couldn't find any flights from {{ origin }} to {{ destination }} on this specific date.</p>
+<!-- If available, show a suggested nearby date with flights and build a link that repeats the search -->
                 {% if suggested_dates and suggested_dates.outbound %}
                     <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 10px; border: 1px solid #e2e8f0;">
                         <p style="color: #2d3748; font-weight: 600;">Good news! We found a flight nearby on:</p>
@@ -114,6 +127,7 @@
         {% else %}
             <h2 class="flight-section-title">🛫 Outbound: {{ origin }} ➝ {{ destination }}</h2>
             <table class="flights-table">
+<!--List all available outbound flights-->
             {% for flight in outbound_flights %}
               <tr class="flight-row">
                 <td class="col-time"><div class="dt">{{ flight["departure_display"] }}</div><div class="sub">{{ flight["origin"] }}</div></td>
@@ -123,6 +137,7 @@
                 <td><a class="btn" href="{{ url_for('select_seats_page', flight_id=flight.id_flight) }}">Select</a></td>              </tr>
             {% endfor %}
             </table>
+<!-- Handle round-trip logic: show return flights if round trip is selected -->
             {% if trip_type == 'round' %}
                 {% if return_flights|length == 0 %}
                     <div class="no-flights-alert alert-warning" style="margin-top: 50px;">
@@ -131,7 +146,8 @@
                             <p>We found outbound flights, but the return date is unavailable.</p>
                             <p>However, we found a return flight on: <strong>{{ suggested_dates.return }}</strong></p>
                             <a href="/?origin={{origin}}&destination={{destination}}&date={{date}}&trip_type=round&return_date={{suggested_dates.return}}"
-                               class="btn-switch-oneway" style="display: inline-block; text-decoration: none; background-color: #744210;">Check suggested return date</a>
+                               class="btn-switch-oneway" style="display: inline-block; text-decoration: none;
+                               background-color: #744210;">Check suggested return date</a>
                             <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ecc94b;">
                         {% endif %}
                         <p>Alternatively, you can book just the outbound flight in <strong>One Way</strong> mode:</p>
@@ -148,12 +164,16 @@
                     <table class="flights-table">
                     {% for flight in return_flights %}
                       <tr class="flight-row">
-                        <td class="col-time"><div class="dt">{{ flight["departure_display"] }}</div><div class="sub">{{ flight["origin"] }}</div></td>
+                        <td class="col-time">
+                            <div class="dt">{{ flight["departure_display"] }}</div>
+                            <div class="sub">{{ flight["origin"] }}</div>
+                        </td>
                         <td class="arrow">✈</td>
                         <td class="col-time"><div class="dt">{{ flight["arrival_display"] }}</div><div class="sub">{{ flight["destination"] }}</div></td>
                         <td class="col-price">{{ flight["price_display"] }}</td>
-
-                          <td><a class="btn" href="{{ url_for('select_seats_page', flight_id=flight.id_flight) }}">Select</a></td>
+                        <td>
+                            <a class="btn" href="{{ url_for('select_seats_page', flight_id=flight.id_flight) }}">Select</a>
+                        </td>
 
                       </tr>
                     {% endfor %}
@@ -188,7 +208,6 @@
 
 {% block scripts %}
   <script>
-    // --- נתונים ופונקציות ליעדים (לא השתנה) ---
     const destinationInfo = {
         "Tel Aviv": { text: "Tel Aviv is a vibrant city in Israel, known for its stunning Mediterranean beaches, world-class nightlife, and the historic Jaffa port.", fact: "Tel Aviv has the highest number of vegans per capita in the world!" },
         "Amsterdam": { text: "Amsterdam, the capital of the Netherlands, is famous for its artistic heritage, elaborate canal system, and narrow houses with gabled facades.", fact: "There are 165 canals in Amsterdam - more than in Venice!" },
@@ -218,8 +237,6 @@
         if (event.target == document.getElementById('dest-modal')) closeModal();
     }
 
-    // --- פונקציות עזר לטופס ---
-
     function toggleTripType() {
         const isOneWay = document.querySelector('input[name="trip_type"]:checked').value === 'oneway';
         document.getElementById('return-date-div').style.display = isOneWay ? 'none' : '';
@@ -232,33 +249,25 @@
         document.getElementById(labelId).innerText = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
     }
 
-    // --- טעינת הדף והגדרת לוחות השנה ---
     document.addEventListener('DOMContentLoaded', function() {
-        // הגדרת לוח השנה לתאריך חזרה
         const rp = flatpickr('input[name="return_date"]', {
             dateFormat: "Y-m-d",
             minDate: "today",
             onChange: (sd, ds) => updateLabel(ds, "return-label")
         });
 
-        // הגדרת לוח השנה לתאריך יציאה (כולל התיקון לניקוי שגיאות!)
         flatpickr('input[name="date"]', {
             dateFormat: "Y-m-d",
             minDate: "today",
             onChange: (sd, ds) => {
-                // 1. מעדכן את הטקסט בתצוגה
                 updateLabel(ds, "dept-label");
-
-                // 2. מעדכן את המינימום לתאריך חזרה
                 rp.set('minDate', ds);
 
-                // 3. מנקה את השגיאה האדומה מיד כשבוחרים תאריך
                 document.getElementById('error-date').innerText = "";
                 document.querySelector('.custom-date-btn').style.borderColor = "#e2e8f0";
             }
         });
 
-        // שחזור ערכים במידה ויש (למשל אחרי רענון דף)
         const dVal = document.querySelector('input[name="date"]').value;
         const rVal = document.querySelector('input[name="return_date"]').value;
         if(dVal && dVal !== 'None') updateLabel(dVal, "dept-label");
@@ -274,13 +283,10 @@
         el.style.borderColor = valid || !el.value ? "#e2e8f0" : "#e53e3e";
     }
 
-    // --- פונקציית הוולידציה (בדיקת הטופס) ---
     function validateForm() {
-        // 1. ניקוי שגיאות ישנות מתאריך היציאה
         document.getElementById('error-date').innerText = "";
         document.querySelector('.custom-date-btn').style.borderColor = "#e2e8f0";
 
-        // 2. שליפת הערכים מהטופס
         const origin = document.getElementById('origin').value.trim();
         const destination = document.getElementById('destination').value.trim();
         const departureDate = document.querySelector('input[name="date"]').value;
@@ -289,20 +295,17 @@
 
         let isValid = true;
 
-        // 3. בדיקת תאריך יציאה (טיפול ידני - אדום במקום בועה)
         if (!departureDate) {
             document.getElementById('error-date').innerText = "Please select a departure date";
             document.querySelector('.custom-date-btn').style.borderColor = "#e53e3e"; // מסגרת אדומה
             isValid = false;
         }
 
-        // 4. בדיקת היגיון: אי אפשר לטוס לאותה עיר
         if (origin && destination && origin.toLowerCase() === destination.toLowerCase()) {
             alert("⚠️ You cannot fly to the same city you are departing from!");
             isValid = false;
         }
 
-        // 5. בדיקת תאריך חזרה (רק אם נבחר הלוך-חזור)
         if (tripType === 'round' && (!returnDate || returnDate === '')) {
             alert("⚠️ Please select a Return Date for a round trip.");
             isValid = false;
