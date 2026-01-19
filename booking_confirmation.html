@@ -1,3 +1,7 @@
+<!--Booking confirmation page.
+Displays a successful booking message along with the booking reference
+and the email associated with the reservation.-->
+
 {% extends 'base.html' %}
 
 {% block title %}Booking Confirmed - FlyTAU{% endblock %}
@@ -5,25 +9,26 @@
 {% block body_class %}inner-page{% endblock %}
 
 {% block content %}
-<div class="container" style="display: flex; justify-content: center; align-items: center; min-height: 80vh; margin-top: 40px;">
+<div class="container confirmation-wrapper">
 
-    <div style="background: white; padding: 50px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; max-width: 600px;">
-        
-        <div style="font-size: 4rem; margin-bottom: 20px;">✈️</div>
-        
-        <h1 style="color: #27ae60; font-family: 'Oswald', sans-serif; margin-bottom: 10px;">Booking Confirmed!</h1>
-        <p style="color: #555; font-size: 1.1rem;">Thank you for flying with us.</p>
+    <div class="confirmation-card">
 
-        <div style="margin: 30px 0; padding: 20px; background: #f8f9fa; border-radius: 10px; border: 1px dashed #ccc;">
-            <p style="text-transform: uppercase; font-size: 0.9rem; color: #777; margin-bottom: 5px;">Booking Reference</p>
-            <p style="font-size: 2.5rem; font-weight: bold; color: #1a2a6c; margin: 0;">#{{ booking_id }}</p>
+        <div class="confirmation-icon">✈️</div>
+
+        <h1 class="confirmation-title">Booking Confirmed!</h1>
+        <p class="confirmation-subtitle">Thank you for flying with us.</p>
+
+        <div class="reference-box">
+            <p class="reference-label">Booking Reference</p>
+            <p class="reference-number">#{{ booking_id }}</p>
         </div>
 
-        <p style="margin-bottom: 30px; line-height: 1.6;"> 
-            Save this booking reference to view or manage your reservation using your email (<strong style="color: #1a2a6c;">{{ email }}</strong>). 
+        <p class="confirmation-text">
+            Save this booking reference to view or manage your reservation using your email
+            (<strong class="highlight-email">{{ email }}</strong>).
         </p>
-        
-        <a href="/" class="btn" style="background-color: #1a2a6c; padding: 15px 40px; text-decoration: none; color: white; border-radius: 8px; font-weight: bold; transition: 0.3s;">Back to Home Page</a>
+
+        <a href="/" class="btn btn-confirmation-home">Back to Home Page</a>
     </div>
 
 </div>
