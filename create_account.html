@@ -1,3 +1,8 @@
+<!--User registration page.
+Allows new users to create an account by providing personal details,
+contact information, and credentials, with client-side validation and date picker support.-->
+
+
 {% extends "base.html" %}
 
 {% block title %}FlyTAU - Join Us{% endblock %}
@@ -38,12 +43,14 @@
             <div class="form-row">
                 <div class="input-group">
                     <label>Date of Birth</label>
-                    <input type="text" id="birth-date" name="date_of_birth" required value="{{ date_of_birth or '' }}" placeholder="Select Date">
+                    <input type="text" id="birth-date" name="date_of_birth" required value="{{ date_of_birth or '' }}"
+                           placeholder="Select Date">
                 </div>
                 <div class="input-group">
                     <label>Passport Number</label>
                     <input type="text" name="passport_number" required value="{{ passport_number or '' }}"
-                           pattern="[A-Z0-9]{6,9}" title="Passport must be 6-9 alphanumeric characters" placeholder="A12345678">
+                           pattern="[A-Z0-9]{6,9}" title="Passport must be 6-9 alphanumeric characters"
+                           placeholder="A12345678">
                 </div>
             </div>
 
@@ -57,6 +64,8 @@
 
             <div class="input-group">
                 <label>Phone Numbers</label>
+
+<!-- Allow users to provide multiple phone numbers dynamically -->
                 <div id="phones">
                   <input type="text" name="phone_numbers" required placeholder="Phone number" class="phone-input"
                          pattern="[0-9]{9,15}" title="Digits only, 9-15 characters" >
@@ -86,7 +95,6 @@
 
 {% block scripts %}
 <script>
-    // הגדרת לוח שנה
     flatpickr("#birth-date", {
         dateFormat: "Y-m-d",
         altInput: true,
@@ -96,7 +104,6 @@
         theme: "airbnb"
     });
 
-    // הוספת טלפונים
     function addPhone() {
         const container = document.getElementById("phones");
         const input = document.createElement("input");
