@@ -1,12 +1,16 @@
+<!--Bookings management page.
+Displays user bookings grouped by status, supports filtering,
+and allows cancelling confirmed bookings with validation and confirmation modals.-->
+
 {% extends "base.html" %}
-
 {% block title %}My Bookings - FlyTau{% endblock %}
-
 {% block body_class %}bookings-page-body{% endblock %}
 
 {% block content %}
 <div class="dashboard-container">
     <div class="header-section">
+
+        <!-- Switch page behavior between guest view and logged-in user view -->
         {% if is_guest %}
             <h1>Booking Details</h1>
             <p>Viewing details for booking #{{ (confirmed + completed + cancelled_by_you + cancelled_by_system)[0].info.id_booking if (confirmed or completed or cancelled_by_you or cancelled_by_system) else '' }}</p>
@@ -17,18 +21,16 @@
     </div>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div style="padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center;
-                      background-color: {{ '#f0fff4' if category == 'success' else '#fff5f5' }};
-                      color: {{ '#2f855a' if category == 'success' else '#c53030' }};
-                      border: 1px solid {{ '#9ae6b4' if category == 'success' else '#fc8181' }};">
-            {{ message }}
-          </div>
-        {% endfor %}
-      {% endif %}
+    {% if messages %}
+    {% for category, message in messages %}
+      <div class="custom-alert {{ 'custom-alert-success' if category == 'success' else 'custom-alert-error' }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+    {% endif %}
     {% endwith %}
 
+<!-- Show booking status filter only for logged-in users -->
     {% if not is_guest %}
     <div class="filter-section">
         <label class="filter-label">Filter by Status:</label>
@@ -86,18 +88,11 @@
                     </div>
                     {% endfor %}
                 </div>
-                    {% if category == 'Confirmed' %}
+
+                {% if category == 'Confirmed' %}
                     <div style="margin-top: 20px; text-align: right;">
                         <button type="button" class="btn-cancel-flight"
                                 onclick="initiateCancel('{{ booking.info.id_booking }}', '{{ booking.info.departure_time.isoformat() }}', {{ booking.info.total_price|float }})">
-                            Cancel Booking
-                        </button>
-                    </div>
-                {% else %}
-                    <div style="margin-top: 20px; text-align: right;">
-                        <button type="button" class="btn-cancel-flight" disabled
-                                style="background-color: #edf2f7; color: #a0aec0; border-color: #e2e8f0; cursor: not-allowed;"
-                                title="Cancellation is no longer available for this booking">
                             Cancel Booking
                         </button>
                     </div>
@@ -113,6 +108,7 @@
     </div>
 </div>
 
+<!-- Cancellation unavailable modal: shown when flight is less than 36 hours away -->
 <div id="modal-too-late" class="modal-overlay">
     <div class="modal-box">
         <h3 style="color: #c53030;">Cancellation Unavailable</h3>
