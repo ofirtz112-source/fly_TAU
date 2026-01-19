@@ -1,3 +1,7 @@
+<!--Passenger details page.
+Collects details only for the primary passenger (contact person) and one additional passenger.
+If more than 2 seats were selected, the remaining passengers are auto-filled by duplicating the primary passenger’s details.-->
+
 {% extends 'base.html' %}
 
 {% block title %}Passenger Details - FlyTAU{% endblock %}
@@ -28,6 +32,8 @@
                     </tr>
                 </thead>
                 <tbody>
+
+                <!--Lists each selected seat with its class and price -->
                     {% for s in seats_list %}
                     <tr>
                         <td class="seat-code"><strong>{{ s.seat_code }}</strong></td>
@@ -50,6 +56,7 @@
 
                 <div class="passenger-card">
                     <h3>
+<!--Marks the first passenger as the primary contact person-->
                         {% if i == 1 %}
                             Primary Passenger
                             <span class="badge" style="background: #ebf8ff; color: #3182ce; padding: 5px 10px; border-radius: 15px; font-size: 0.8rem;">Contact Person</span>
@@ -118,6 +125,8 @@
                                 <label>Phone Numbers</label>
 
                                 <div id="phone-container">
+
+<!--If the user is logged in and has stored phone numbers, render them as read-only a-->
                                     {% if is_main_user and user.phone_numbers %}
                                         {% for phone in user.phone_numbers %}
                                         <input type="tel"
@@ -168,13 +177,13 @@
 <script>
     function addPhoneField() {
         const container = document.getElementById('phone-container');
-        const btn = container.querySelector('button'); // מציאת כפתור ההוספה
-        if (!btn) return; // הגנה למקרה שהכפתור לא קיים (משתמש רשום)
+        const btn = container.querySelector('button');
+        if (!btn) return;
 
         const input = document.createElement('input');
         input.type = 'tel';
         input.name = 'phone_numbers';
-        input.className = 'phone-input'; // משתמש באותו קלאס כמו האינפוט הראשי
+        input.className = 'phone-input';
         input.style.marginBottom = '8px';
         input.style.display = 'block';
         input.placeholder = "Another Phone Number";
@@ -185,5 +194,4 @@
     }
 </script>
 {% endblock %}
-
 
