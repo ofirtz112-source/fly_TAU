@@ -16,9 +16,9 @@ class Database:
                     database="flytau",
                     port=3306
                 )
-                print("✅ Connected to 'flytau' database (Singleton)")
+                print("Connected to 'flytau' database (Singleton)")
             except mysql.connector.Error as err:
-                print(f"❌ Connection Error: {err}")
+                print(f"Connection Error: {err}")
                 cls._instance.connection = None
         return cls._instance
 
