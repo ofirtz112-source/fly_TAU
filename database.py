@@ -467,6 +467,7 @@ class Database:
             cursor.close()
 
     def cancel_flight_full_logic(self, flight_id):
+        """Executes a transaction to update a flight's status to 'Cancelled' and automatically marks all associated bookings as 'Cancelled_System'"""
         cursor = self.connection.cursor()
         try:
             cursor.execute("UPDATE flights SET flight_status = 'Cancelled' WHERE id_flight = %s", (flight_id,))
