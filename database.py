@@ -664,8 +664,7 @@ class Database:
         finally:
             cursor.close()
 
-    def add_new_flight(self, route_id, plane_id, departure_time, pilots_ids, attendants_ids, manager_id, price_eco,
-                       price_bus):
+    def add_new_flight(self, route_id, plane_id, departure_time, pilots_ids, attendants_ids, manager_id, price_eco, price_bus):
         """Creating a new flight, assigning the crew, and setting prices"""
         cursor = self.connection.cursor()
         try:
