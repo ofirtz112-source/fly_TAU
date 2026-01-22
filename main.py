@@ -434,6 +434,7 @@ def check_availability_api():
         return jsonify({"can_proceed": False, "error_msg": "Resource calculation error"}), 200
     return jsonify(response)
 
+"""Processes a POST request to create a new flight after verifying manager authorization and collecting route, aircraft, crew, and pricing details"""
 @app.route("/manager/add_flight", methods=['POST'])
 def add_flight():
     if session.get("role") != "manager":
