@@ -5,7 +5,9 @@ from utils import prepare_flights_for_view, _format_datetime
 db = Database()
 
 # --- Section 1: Booking Lifecycle ---
+
 class Flight:
+    """Initializes a Flight object by fetching its details from the database using a specific ID, populating core attributes or raising an error if the flight is not found"""
     def __init__(self, flight_id):
         data = db.get_flight_data(flight_id=flight_id)
         if data:
@@ -55,8 +57,9 @@ class BigPlane(Plane):
         self.dimensions["Business"] = {"rows": int(bus_rows), "cols": int(bus_cols)}
 
 # --- Section 2: User Authentication ---
-"""A foundational class that represents all system participants, storing core identity data and providing property methods to verify user roles and access levels"""
+
 class User:
+    """A foundational class that represents all system participants, storing core identity data and providing property methods to verify user roles and access levels"""
     def __init__(self, role="guest", user_id=None, first_name=None, last_name=None, phone_numbers=None):
         self.role = role
         self.user_id = user_id
@@ -85,6 +88,7 @@ class Guest(User):
         super().__init__(role="guest")
 
 class Customer(User):
+    """Initializes a registered customer instance by assigning personal identification attributes and setting the user role to 'registered' within the system."""
     def __init__(self, email, first_name, last_name=None, passport=None, phone_numbers=None, date_of_birth=None):
         super().__init__(
             role="registered",
